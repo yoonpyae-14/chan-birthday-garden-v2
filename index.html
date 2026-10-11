@@ -1,0 +1,555 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="theme-color" content="#edf6ee">
+
+<title>Chan's Little Birthday Garden ♡</title>
+
+<style>
+
+:root{--mint:#eaf5ec;--sage:#8eae98;--deep:#385a49;--cream:#fffdf6;--pink:#f5e6e5}
+
+*{box-sizing:border-box}
+
+body{margin:0;background:linear-gradient(160deg,#f4f8ed,#e4f1e8);color:var(--deep);font-family:Georgia,'Times New Roman',serif;min-height:100vh}
+
+button,input{font:inherit}
+
+button{cursor:pointer;transition:.2s}
+
+button:hover{transform:translateY(-2px)}
+
+button:disabled{opacity:.5;cursor:default;transform:none}
+
+#app{max-width:600px;margin:auto;padding:24px 17px 50px;min-height:100vh}
+
+.card{background:#fffdf6ed;border:1px solid #d5e6d7;border-radius:25px;padding:25px 21px;box-shadow:0 12px 32px #688b7012;margin:12px 0}
+
+.center{text-align:center}
+
+.eyebrow{font-size:.77rem;letter-spacing:3px;text-transform:uppercase;color:#789681}
+
+h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:normal;margin:14px 0}
+
+h2{font-weight:normal;font-size:1.65rem}
+
+p{line-height:1.8}
+
+.sub{color:#738a78;font-size:.94rem}
+
+.flower{font-size:2.4rem;margin:14px}
+
+input{width:100%;padding:15px;border:1px solid #c7dccb;border-radius:13px;background:white;color:var(--deep);margin:9px 0;outline-color:#8eae98}
+
+.btn{border:0;border-radius:14px;padding:14px 18px;background:#8eae98;color:white;width:100%;margin-top:10px}
+
+.btn.light{background:#e6f0e7;color:#385a49;border:1px solid #cbded0}
+
+.btn.cream{background:#fffdf6;color:#385a49;border:1px solid #cbded0}
+
+.options{display:grid;gap:10px;margin:20px 0}
+
+.option{border:1px solid #cbded0;border-radius:13px;padding:14px;background:white;color:#385a49;text-align:left;width:100%}
+
+.option:active{background:#e6f0e7}
+
+.hidden{display:none!important}
+
+.progress{height:5px;border-radius:9px;background:#dce9dd;overflow:hidden;margin:15px 0}
+
+.progress span{display:block;height:100%;width:0;background:#83a990;transition:.3s}
+
+#message{min-height:28px;color:#789681;font-size:.92rem}
+
+.starfield{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+
+.firefly{border:1px solid #d8e7d8;background:#edf6e9;border-radius:18px;min-height:75px;font-size:2rem}
+
+.firefly.caught{background:#d6ebd5}
+
+.memory{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:20px 0}
+
+.tile{aspect-ratio:1;border:1px solid #d1e2d3;background:#e6f0e7;border-radius:12px;font-size:1.6rem;color:#385a49;padding:0}
+
+.tile.open{background:white}
+
+.maze{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:20px 0}
+
+.cell{aspect-ratio:1;border:1px solid #d1e2d3;background:#e6f0e7;border-radius:12px;font-size:1.5rem}
+
+.cell.seen{background:#fffdf6}
+
+.letter{font-size:1rem;white-space:normal}
+
+.letter p{margin:0 0 15px}
+
+.page-no{font-size:.8rem;color:#88a18c;letter-spacing:2px}
+
+.gift{font-size:5rem;animation:bob 1.5s ease-in-out infinite}
+
+@keyframes bob{50%{transform:translateY(-8px)}}
+
+@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+.screen{animation:fade .35s ease}
+
+footer{text-align:center;font-size:.8rem;color:#8aa18e;margin-top:24px}
+
+a{color:#52785d}
+
+</style>
+
+</head>
+
+<body>
+
+<main id="app">
+
+<section id="welcome" class="screen card center">
+
+<div class="eyebrow">a little birthday adventure</div>
+
+<div class="flower">🌿 ✿ 🌿</div>
+
+<h1>A Little<br>Birthday Garden</h1>
+
+<p>To someone who makes my ordinary days feel a little less ordinary. 🌿</p>
+
+<p class="sub">Before we begin, may I know your name?</p>
+
+<input id="name" placeholder="Enter your name..." autocomplete="off">
+
+<button class="btn" onclick="checkName()">Enter the Garden ♡</button>
+
+<p id="nameError" class="sub"></p>
+
+</section>
+
+<section id="birthday" class="hidden screen card center">
+
+<div class="flower">🎂</div>
+
+<div class="eyebrow">one little question</div>
+
+<h2>Who is today's birthday star?</h2>
+
+<p class="sub">Choose the birthday person to continue.</p>
+
+<div class="options">
+
+<button class="option" onclick="birthdayAnswer(false)">Someone else</button>
+
+<button class="option" onclick="birthdayAnswer(true)">Chan ♡</button>
+
+<button class="option" onclick="birthdayAnswer(false)">The garden fairy 🌸</button>
+
+</div>
+
+<p id="birthdayMsg" class="sub"></p>
+
+</section>
+
+<section id="game" class="hidden screen card">
+
+<div class="eyebrow" id="stageLabel">GAME 1 OF 4</div>
+
+<div class="progress"><span id="progress"></span></div>
+
+<h2 id="gameTitle"></h2>
+
+<p id="gameDesc" class="sub"></p>
+
+<div id="gameArea"></div>
+
+<p id="message" class="center" aria-live="polite"></p>
+
+<button id="next" class="btn hidden" onclick="nextStage()">Next Game →</button>
+
+</section>
+
+<section id="letter" class="hidden screen card">
+
+<div class="center">
+
+<div class="flower">💌</div>
+
+<div class="eyebrow">a little letter for you</div>
+
+<h2 id="letterTitle">Happy Birthday, Chan. ♡</h2>
+
+</div>
+
+<div id="letterBody" class="letter"></div>
+
+<div class="page-no center" id="pageNo">PAGE 1 OF 5</div>
+
+<button id="letterNext" class="btn" onclick="nextLetter()">Continue ♡</button>
+
+</section>
+
+<section id="gift" class="hidden screen card center">
+
+<div class="eyebrow">one last little surprise</div>
+
+<div class="gift">🎁</div>
+
+<h1>A little gift for you</h1>
+
+<p>I hope this year gives you as much happiness as you quietly bring to the people around you.</p>
+
+<button class="btn" onclick="openGift()">Open your gift ♡</button>
+
+<div id="giftReveal" class="hidden">
+
+<div class="flower">🌷 ✨ 🌷</div>
+
+<p>And if you ever forget how special you are, I hope this little letter reminds you.</p>
+
+<p>Happy 19th Birthday, Chan! 🤍</p>
+
+<a href="https://www.youtube.com/results?search_query=Elliot+James+Reay+I+Think+They+Call+This+Love+official+music+video" target="_blank" rel="noopener">
+
+<button class="btn light">♫ Play our birthday song</button>
+
+</a>
+
+<p class="sub">The song opens on YouTube. Tap play there to listen.</p>
+
+</div>
+
+</section>
+
+<footer>made with warmth, just for Chan ♡</footer>
+
+</main>
+
+<script>
+
+const $=id=>document.getElementById(id);
+
+function show(id){
+
+['welcome','birthday','game','letter','gift'].forEach(s=>$(s).classList.toggle('hidden',s!==id));
+
+window.scrollTo({top:0,behavior:'smooth'});
+
+}
+
+function checkName(){
+
+const n=$('name').value.trim().toLowerCase();
+
+if(n==='chan'||n==='aye chan myat mon oo'){
+
+$('nameError').textContent='';
+
+show('birthday');
+
+}else{
+
+$('nameError').textContent='Hmm, this little garden is only for Chan. Try the name again ♡';
+
+}
+
+}
+
+$('name').addEventListener('keydown',e=>{if(e.key==='Enter')checkName()});
+
+function birthdayAnswer(ok){
+
+if(ok){stage=0;show('game');renderGame();}
+
+else $('birthdayMsg').textContent='Not quite! Try again, birthday detective. 🌷';
+
+}
+
+let stage=0, fireflies=0, matches=0, first=null, lock=false, keyFound=false;
+
+const stages=[
+
+['Catch the Fireflies ✨','Tap 5 glowing fireflies to light up the garden.'],
+
+['Memory Match 🃏','Find all 4 matching pairs. Tap two cards at a time.'],
+
+['Find the Hidden Key 🔑','Explore the garden tiles to find the hidden key.'],
+
+['Guess the Surprise 🎁','Choose what you think is waiting at the end.']
+
+];
+
+function renderGame(){
+
+$('stageLabel').textContent=`GAME ${stage+1} OF 4`;
+
+$('progress').style.width=`${stage/4*100}%`;
+
+$('gameTitle').textContent=stages[stage][0];
+
+$('gameDesc').textContent=stages[stage][1];
+
+$('gameArea').innerHTML='';
+
+$('message').textContent='';
+
+$('next').classList.add('hidden');
+
+if(stage===0)gameFireflies();
+
+if(stage===1)gameMemory();
+
+if(stage===2)gameKey();
+
+if(stage===3)gameGuess();
+
+}
+
+function winGame(msg){
+
+$('message').textContent=msg;
+
+$('progress').style.width=`${(stage+1)/4*100}%`;
+
+$('next').textContent=stage===3?'Open your letter 💌':'Next Game →';
+
+$('next').classList.remove('hidden');
+
+}
+
+function nextStage(){
+
+stage++;
+
+if(stage<4)renderGame();
+
+else{letterPage=0;renderLetter();show('letter');}
+
+}
+
+function gameFireflies(){
+
+fireflies=0;
+
+const wrap=document.createElement('div');wrap.className='starfield';
+
+for(let i=0;i<9;i++){
+
+const b=document.createElement('button');b.className='firefly';b.textContent=['✦','✧','✨'][i%3];
+
+b.setAttribute('aria-label','Firefly');
+
+b.onclick=()=>{
+
+if(b.disabled)return;
+
+b.disabled=true;b.classList.add('caught');b.textContent='🌟';fireflies++;
+
+$('message').textContent=`${fireflies} of 5 fireflies caught ✨`;
+
+if(fireflies>=5){wrap.querySelectorAll('button').forEach(x=>x.disabled=true);winGame("The garden is glowing! I'm glad our paths crossed, Chan. ♡");}
+
+};
+
+wrap.appendChild(b);
+
+}
+
+$('gameArea').appendChild(wrap);
+
+}
+
+function gameMemory(){
+
+matches=0;first=null;lock=false;
+
+const icons=['🌼','⭐','🦋','🍀','🌼','⭐','🦋','🍀'];
+
+for(let i=icons.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[icons[i],icons[j]]=[icons[j],icons[i]];}
+
+const wrap=document.createElement('div');wrap.className='memory';
+
+icons.forEach(icon=>{
+
+const b=document.createElement('button');b.className='tile';b.textContent='?';b.dataset.icon=icon;
+
+b.onclick=()=>{
+
+if(lock||b.classList.contains('open')||b.disabled)return;
+
+b.textContent=b.dataset.icon;b.classList.add('open');
+
+if(!first){first=b;return;}
+
+if(first.dataset.icon===b.dataset.icon){
+
+first.disabled=true;b.disabled=true;first=null;matches++;
+
+if(matches===4)winGame('Perfect match! You found every pair. 🌷');
+
+}else{
+
+lock=true;const prev=first;first=null;
+
+setTimeout(()=>{prev.textContent='?';b.textContent='?';prev.classList.remove('open');b.classList.remove('open');lock=false;},650);
+
+}
+
+};
+
+wrap.appendChild(b);
+
+});
+
+$('gameArea').appendChild(wrap);
+
+}
+
+function gameKey(){
+
+keyFound=false;
+
+const wrap=document.createElement('div');wrap.className='maze';
+
+let keyIndex=Math.floor(Math.random()*16);
+
+for(let i=0;i<16;i++){
+
+const b=document.createElement('button');b.className='cell';b.textContent='🌿';
+
+b.onclick=()=>{
+
+if(b.disabled||keyFound)return;
+
+b.classList.add('seen');
+
+if(i===keyIndex){b.textContent='🔑';keyFound=true;wrap.querySelectorAll('button').forEach(x=>x.disabled=true);winGame('You found the key! The next door is open. 🔓');}
+
+else{b.textContent=['🌸','🍃','✨','🌼'][Math.floor(Math.random()*4)];b.disabled=true;}
+
+};
+
+wrap.appendChild(b);
+
+}
+
+$('gameArea').appendChild(wrap);
+
+$('message').textContent='Tap the tiles to search for the key.';
+
+}
+
+function gameGuess(){
+
+const wrap=document.createElement('div');wrap.className='options';
+
+const choices=[
+
+['A secret letter 💌',true],
+
+['A tiny flower 🌷',false],
+
+['A magic star ⭐',false]
+
+];
+
+choices.forEach(([label,correct])=>{
+
+const b=document.createElement('button');b.className='option';b.textContent=label;
+
+b.onclick=()=>{
+
+if(correct){wrap.querySelectorAll('button').forEach(x=>x.disabled=true);winGame('You guessed it! Your final surprise is waiting. ♡');}
+
+else $('message').textContent='Not quite! Try another answer. Hint: it holds words written just for you. 🌿';
+
+};
+
+wrap.appendChild(b);
+
+});
+
+$('gameArea').appendChild(wrap);
+
+}
+
+const pages=[
+
+`<p>First of all, happy birthday to you, Chan. 🤍</p>
+
+<p>I hope today brings you so much happiness, beautiful memories, and all the little things that make your heart smile. You deserve a day that feels as special as you are, and I hope this new chapter of your life will be filled with nothing but beautiful things.</p>
+
+<p>Before anything else, I just want to say thank you. Thank you for always being there for me, for listening to me, and for giving me strength whenever I needed it. You might not even realize it, but sometimes your words, your presence, and the way you care can make someone's day so much better. And for me, that someone is me. I'm genuinely grateful that I got to know you and have you in my life.</p>`,
+
+`<p>I hope life will always be kind to you. I hope you meet more beautiful people, experience more wonderful moments, and find happiness in places you never expected. I hope the people around you are people who truly love you, care about you, appreciate you, and make you feel that you are enough.</p>
+
+<p>People who choose you, stay with you, and never make you question your worth. And if I can be one of those people for you, even in my own little way, I would be happy.</p>
+
+<p>I hope you get to do all the things you've been dreaming of. I hope you have the courage to chase what you want, the strength to get through difficult days, and the patience to keep going when things don't work out the way you planned.</p>`,
+
+`<p>May you find more reasons to smile than reasons to cry, and may your heart always have a place where it can rest peacefully.</p>
+
+<p>And Chan, please remember that you don't always have to be strong. It's okay to feel tired. It's okay to have bad days. It's okay when things don't go as planned. You don't have to figure everything out at once. Whatever life brings you, I hope you never forget how precious you are and how much good you deserve.</p>
+
+<p>I can't promise that I will always have the perfect words to say, or that I will know how to make every difficult day better. But whenever you need someone to listen, someone to cheer you on, or simply someone to sit beside you when the world feels a little too heavy, I hope you know that you can always count on me.</p>`,
+
+`<p>I'll be here, rooting for you, celebrating your little victories, and wishing the best for you, even on the days when you don't feel your best.</p>
+
+<p>You know, some people come into our lives and make ordinary days feel a little brighter without even trying. They become a small but meaningful part of our everyday happiness. And sometimes, we don't tell them enough how much their presence means to us. So today, I just want you to know that I'm really glad you're here, and I'm really glad that our paths crossed.</p>
+
+<p>As you grow older, I hope you never lose the little things that make you you. I hope you keep smiling that smile, keep chasing your dreams, and keep finding beautiful reasons to love the life you're living.</p>`,
+
+`<p>And whenever you look back on this birthday, I hope you remember that someone was genuinely wishing for your happiness, your peace, and your beautiful future.</p>
+
+<p>Happy birthday once again, Chan. 🎂</p>
+
+<p>May this year be gentle with your heart, generous with its blessings, and full of moments that remind you how beautiful life can be. I hope the future brings you closer to everything you've been wishing for.</p>
+
+<p>And no matter how much life changes, I hope there will always be people beside you who make you feel loved, understood, and safe to be yourself.</p>
+
+<p>Please keep being you, Chan. The world is a little brighter with you in it.</p>
+
+<p>With lots of warmth and the sincerest wishes for your happiness,<br>Someone who's always rooting for you. ♡</p>`
+
+];
+
+let letterPage=0;
+
+function renderLetter(){
+
+$('letterBody').innerHTML=pages[letterPage];
+
+$('pageNo').textContent=`PAGE ${letterPage+1} OF ${pages.length}`;
+
+$('letterNext').textContent=letterPage===pages.length-1?'Open your final gift 🎁':'Continue ♡';
+
+}
+
+function nextLetter(){
+
+if(letterPage<pages.length-1){letterPage++;renderLetter();window.scrollTo({top:0,behavior:'smooth'});}
+
+else show('gift');
+
+}
+
+function openGift(){
+
+$('giftReveal').classList.remove('hidden');
+
+$('giftReveal').scrollIntoView({behavior:'smooth',block:'nearest'});
+
+}
+
+</script>
+
+</body>
+
+</html>
